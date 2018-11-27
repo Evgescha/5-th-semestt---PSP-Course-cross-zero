@@ -33,12 +33,81 @@ public class Game extends JFrame {
 	private JTable table;
 	static int typeGame = 0;
 	static int whyGO = 0;
+	static JTextPane textPane;
 	int a = (int) Math.ceil((Math.random()));
+	ReadWin RW;
+	ReadAnswer RA ;
+	JButton button;
+	JButton button_2;
+	
+	private class ReadAnswer extends Thread {
+		@Override
+		public void run() {
+			try {
+				while (true) {
+					Thread.sleep(500);
+					if (StartApp.getAnsX() != "-1" && StartApp.getAnsY() != "-1") {
+						if (textPane.getText().equals("!")) {
+							
+							StartApp.setAnsX("-1");
+							StartApp.setAnsY("-1");
+							return;
+						}
+							
+						table.getModel().setValueAt("O", Integer.parseInt(StartApp.getAnsX()),
+								Integer.parseInt(StartApp.getAnsY()));
+						textPane.setText("Противник ходит: " + StartApp.getAnsX() + "," + StartApp.getAnsY() + "\n"
+								+ textPane.getText());
+
+						StartApp.setAnsX("-1");
+						StartApp.setAnsY("-1");
+
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private class ReadWin extends Thread {
+		@Override
+		public void run() {
+			try {
+				// JOptionPane.showMessageDialog(null, "Поток работает");
+				while (true) {
+					Thread.sleep(400);
+					String check = StartApp.CheckGame(table);
+					if (check.equals("X") || check.equals("O") || !StartApp.CanMove(table)) {
+						if (check.equals("X"))
+							textPane.setText("Поздравляем, вы выйграли!" + "\n" + textPane.getText());
+						if (check.equals("O"))
+							textPane.setText("Жаль, но вы проиграли. Не отчаивайтесь, повезет в следующий раз!" + "\n"
+									+ textPane.getText());
+						if (!StartApp.CanMove(table))
+							textPane.setText("Интересно вышло, ходы кончились... Еще раз!" + "\n" + textPane.getText());
+						RA.stop();
+						
+						button.setEnabled(false);
+						table.removeAll();
+						// RA.stop();
+
+						this.stop();
+
+					}
+
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	public Game(int typeGame) {
-		
-		//if (typeGame == 1)			JOptionPane.showMessageDialog(null, "Вы играете с ПК");
-		//if (typeGame == 2)			JOptionPane.showMessageDialog(null, "Вы играете с Другим пользователем");
+
+		// if (typeGame == 1) JOptionPane.showMessageDialog(null, "Вы играете с ПК");
+		// if (typeGame == 2) JOptionPane.showMessageDialog(null, "Вы играете с Другим
+		// пользователем");
 		this.typeGame = typeGame;
 		setFont(new Font("Dialog", Font.PLAIN, 30));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -61,8 +130,7 @@ public class Game extends JFrame {
 			public void mouseClicked(MouseEvent arg0) {
 			}
 		});
-		table.setModel(new DefaultTableModel(
-				new Object[][] { { null, null, null }, { null, null, null }, { null, null, null }, },
+		table.setModel(new DefaultTableModel(new Object[][] { { "", "", "" }, { "", "", "" }, { "", "", "" }, },
 				new String[] { "New column", "New column", "New column" }));
 		table.getColumnModel().getColumn(0).setMinWidth(10);
 		table.getColumnModel().getColumn(1).setMinWidth(10);
@@ -79,7 +147,7 @@ public class Game extends JFrame {
 
 		contentPane.add(table);
 
-		JTextPane textPane = new JTextPane();
+		textPane = new JTextPane();
 		textPane.setEditable(false);
 		textPane.setBounds(270, 35, 162, 200);
 		contentPane.add(textPane);
@@ -97,34 +165,56 @@ public class Game extends JFrame {
 		label_2.setBounds(269, 10, 163, 14);
 		contentPane.add(label_2);
 
-		JButton button = new JButton("Ходить");
+		button = new JButton("Ходить");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-			//	if(table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn())) {
-				table.getModel().setValueAt("X", table.getSelectedRow(), table.getSelectedColumn());
-				StartApp.setMessageForSever(table.getSelectedRow()+","+ table.getSelectedColumn());
-				System.out.println("Ходим по координатам"+StartApp.getMessageForSever());
-				JOptionPane.showMessageDialog(null, "Вы походили по координатам\n" +StartApp.getMessageForSever());
-			//}
-				//JOptionPane.showMessageDialog(null, "failed HOD");
-				}
+
+				if (table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) == "") {
+
+					table.getModel().setValueAt("X", table.getSelectedRow(), table.getSelectedColumn());
+					
+					System.out.println("Ходим по координатам: " + StartApp.getMessageForSever());
+					textPane.setText("Ходим по координатам: " + StartApp.getMessageForSever() + "\n" + textPane.getText());
+					
+					try {
+						Thread.sleep(1000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					if(StartApp.CheckGame(table)==" ")
+					StartApp.setMessageForSever(table.getSelectedRow() + "," + table.getSelectedColumn());
+					
+					
+					
+					
+					
+					
+					
+					
+					
+					
+				} else
+					JOptionPane.showMessageDialog(null, "ячейка заполнена");
+
+				
+			}
 		});
 		button.setBounds(10, 246, 91, 23);
 		contentPane.add(button);
 
-		JButton button_1 = new JButton("Новая игра");
-		button_1.setBounds(163, 246, 119, 23);
-		contentPane.add(button_1);
-
-		JButton button_2 = new JButton("Назад");
+		button_2 = new JButton("Назад");
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StartApp.showMainForm();
 				StartApp.hideGameForm();
-				StartApp.newGameForm();
+				
 			}
 		});
 		button_2.setBounds(341, 246, 91, 23);
 		contentPane.add(button_2);
+
+		RW = new ReadWin();RW.start();
+		RA = new ReadAnswer();RA.start();
 	}
 }

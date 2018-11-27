@@ -29,8 +29,9 @@ class Server {
 		InetAddress IP = InetAddress.getLocalHost();
 		System.out.println("IP адрес системы - " + IP.getHostAddress());
 
-		//System.out.println("Введите порт для работы с клиентами (8080 по умолчанию)");
-		//int portServ = sc.nextInt();
+		// System.out.println("Введите порт для работы с клиентами (8080 по
+		// умолчанию)");
+		// int portServ = sc.nextInt();
 
 		ServerSocket server = new ServerSocket(portServ);
 		System.out.println("Server Started");
@@ -62,6 +63,7 @@ class Serverss extends Thread {
 	Socket fromclient = null;
 	int[][] arr = new int[3][3];
 	static int ID = -1;
+	static int idEnemy = -1;
 
 	public Serverss(Socket fromclient, int id) throws IOException {
 		this.fromclient = fromclient;
@@ -69,53 +71,58 @@ class Serverss extends Thread {
 		in = new BufferedReader(new InputStreamReader(fromclient.getInputStream()));
 		out = new PrintWriter(fromclient.getOutputStream(), true);
 		out.println(ID);
-		// BufferedReader inu = new BufferedReader(new InputStreamReader(System.in));
 		start();
 	}
 
-//	void sendMessage(String msg) {
-//		for (Serverss vr : Server.serverList) {
-//			vr.out.println(msg);
-//		}
-//	}
-//
-//	public class WriteMsg extends Thread {
-//		Scanner sc = new Scanner(System.in);
-//
-//		@Override
-//		public void run() {
-//			while (true) {
-//
-//				for (Serverss vr : Server.serverList) {
-//					vr.out.println(sc.nextLine());
-//
-//				}
-//			}
-//		}
-//	}
+	// void sendMessage(String msg) {
+	// for (Serverss vr : Server.serverList) {
+	// vr.out.println(msg);
+	// }
+	// }
+	//
+
+	public void printArr() {
+		for (int i = 0; i < 3; i++) {
+			for (int j = 0; j < 3; j++) {
+				System.out.print(arr[i][j]);
+			}
+			System.out.println();
+		}
+	}
 
 	@Override
 	public void run() {
-		//new WriteMsg().start();
+		// new WriteMsg().start();
 		try {
 			while (true) {
 				input = in.readLine();
 				System.out.println("В чате пишут: " + input);
 				String[] ans = input.split(",");
-				int x = Integer.parseInt(ans[1]);
-				int y = Integer.parseInt(ans[2]);
-				arr[x][y]=1;
-				
-				for(int i=0; i<3; i++) {
-					for(int j=0; j<3; j++) {
-						System.out.print(arr[i][j]);
+				if (!ans[1].equals("newArr")) {
+					
+					int x_, x = Integer.parseInt(ans[1]);
+					int y_, y = Integer.parseInt(ans[2]);
+					arr[x][y] = 1;
+					printArr();
+
+					if (Integer.parseInt(ans[3]) == -1) {
+
+						do {
+							x_ = (int) (Math.random() * 3);
+							y_ = (int) (Math.random() * 3);
+						} while (arr[x_][y_] != 0);
+						arr[x_][y_] = 5;
+						out.println("-1," + x_ + "," + y_);
+					} else {
 					}
-					System.out.println();
+				} else {
+					arr = new int[3][3];
 				}
-			
 			}
 		} catch (IOException e) {
-			System.out.println("Общение скончалось(((");
+			// System.out.println("Общение скончалось(((");
+			System.out.println("Пользователь с ID " + ID + " вышел");
+			Server.serverList.remove(this);
 			// e.printStackTrace();
 		}
 

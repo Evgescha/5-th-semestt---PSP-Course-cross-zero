@@ -24,25 +24,21 @@ public class Client {
 	static String msgOut;
 	static String msgIn;
 	int portServ = 8080;
-	static int ID = -1;
 
-	public static int getID() {
-		return ID;
-	}
-
-	public static void setID(int iD) {
-		ID = iD;
-	}
+	
 
 	// читаем смс с серв
 	private class ReadMsg extends Thread {
 		@Override
 		public void run() {
 			try {
-				ID = Integer.parseInt(in.readLine());
+				StartApp.setID(Integer.parseInt(in.readLine()));
 				while (true) {
 					msgIn = in.readLine(); // ждем сообщения с сервера
-					System.out.println(msgIn); // пишем сообщение с сервера на консоль
+					System.out.println("С сервера пришло "+msgIn); // пишем сообщение с сервера на консоль
+					String[] ans = msgIn.split(",");
+					StartApp.setAnsX(ans[1]);
+					StartApp.setAnsY(ans[2]);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -60,7 +56,7 @@ public class Client {
 					Thread.sleep(500);
 
 					if (StartApp.getMessageForSever() != "-1") {
-						out.println(ID+ "," + StartApp.getMessageForSever());
+						out.println(StartApp.getMessageForSever());
 						StartApp.setMessageForSever("-1");
 					}
 				} catch (InterruptedException e) {

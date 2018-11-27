@@ -45,9 +45,12 @@ public class Main extends JFrame {
 		public void run() {
 			try {
 				while (true) {
+					Thread.sleep(1000);
+					if(StartApp.getStatus()!=label_1.getText())
 					label_1.setText(StartApp.getStatus());
 				}
 			} catch (Exception e) {
+				label_1.setText("Ошибка");
 				e.printStackTrace();
 			}
 		}
@@ -77,6 +80,8 @@ public class Main extends JFrame {
 					StartApp.setName(textField.getText());
 					textField.setEnabled(false);
 					button.setEnabled(false);
+					button_2.setEnabled(true);
+					button_1.setEnabled(true);
 					try {
 						StartApp.client.main(null);
 					} catch (IOException e) {
@@ -113,24 +118,29 @@ public class Main extends JFrame {
 		this.getContentPane().add(label_3);
 
 		button_1 = new JButton("Игра с компьютером");
+		button_1.setEnabled(false);
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				if (label_1.getText() == "Подключено") {
+				//if (label_1.getText() == "Подключено") {
 					StartApp.setTypeGame(StartApp.PC);
 					StartApp.newGameForm();
 					StartApp.showGameForm();
 					StartApp.hideMainForm();
-				}
+					StartApp.setIsGame("one");
+				//}
 			}
 		});
 		button_1.setBounds(10, 153, 293, 23);
 		this.getContentPane().add(button_1);
 
 		button_2 = new JButton("Игра с человеком");
+		button_2.setEnabled(false);
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				StartApp.setTypeGame(StartApp.USER);
 				StartApp.newGameForm();
+				StartApp.setIdEnemy(-2);
+				StartApp.setIsGame("find");
 				StartApp.showGameForm();
 				StartApp.hideMainForm();
 			}
