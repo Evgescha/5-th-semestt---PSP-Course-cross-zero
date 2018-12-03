@@ -1,7 +1,5 @@
 package form;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -30,18 +28,18 @@ import javax.swing.ListSelectionModel;
 public class Game extends JFrame {
 
 	private JPanel contentPane;
-	private JTable table;
+	private static JTable table;
 	boolean isExit = false;
-	boolean isWin = false;
+	static boolean isWin = false;
 	static int typeGame = 0;
 	static int whyGO = 0;
 	static JTextPane textPane;
 	static JLabel label_1;
 	int a = (int) Math.ceil((Math.random()));
-	int iGo = Math.random() > 0.5 ? 1 : 0;
-	Hod hod = new Hod();
-	ReadAnswer RA = new ReadAnswer();
-	JButton button;
+	static int iGo = Math.random() > 0.5 ? 1 : 0;
+	Hod hod;
+	ReadAnswer RA;
+	static JButton button;
 	JButton button_2;
 
 	// считать ход врага и поставить нолик
@@ -88,7 +86,7 @@ public class Game extends JFrame {
 		@Override
 		public void run() {
 			try {
-				while (!isExit&&!isWin) {
+				while (!isExit && !isWin) {
 					Thread.sleep(500);
 					System.out.println("iG0 " + iGo);
 					if (StartApp.getTypeGame() == StartApp.PC) {
@@ -113,8 +111,7 @@ public class Game extends JFrame {
 					}
 
 				}
-			
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -122,10 +119,14 @@ public class Game extends JFrame {
 	}
 
 	public Game(int typeGame) {
-
+		isExit = false;
+		isWin = false;
+		hod = new Hod();
+		RA = new ReadAnswer();
 		this.typeGame = typeGame;
 		setFont(new Font("Dialog", Font.PLAIN, 30));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
 		setBounds(100, 100, 450, 300);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -138,6 +139,12 @@ public class Game extends JFrame {
 				return false;
 			}
 		};
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent arg0) {
+				doGo();
+			}
+		});
 		table.setSelectionMode(ListSelectionModel.SINGLE_INTERVAL_SELECTION);
 		table.setFont(new Font("Tahoma", Font.PLAIN, 30));
 
@@ -179,25 +186,9 @@ public class Game extends JFrame {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				// не забыть выбрать ячейку по умолчанию
-				if (table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) == "") {
-
-					table.getModel().setValueAt("X", table.getSelectedRow(), table.getSelectedColumn());
-					StartApp.doGo(table.getSelectedRow(), table.getSelectedColumn());
-					System.out.println("Ходим по координатам: " + table.getSelectedRow() + ","
-							+ table.getSelectedColumn() + "\n" + textPane.getText());
-					textPane.setText("Ходим по координатам: " + (table.getSelectedRow() + 1) + ","
-							+ (table.getSelectedColumn() + 1) + "\n" + textPane.getText());
-
-					if (StartApp.getTypeGame() == StartApp.PC) {
-						ansGo();
-					} else if (StartApp.getTypeGame() == StartApp.USER) {
-						StartApp.setMessageForSever("play," + table.getSelectedRow() + "," + table.getSelectedColumn());
-					}
-
-					iGo = 0;
-					// whoGo();
-					chechWin();
-
+				if (table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) == ""
+						&& table.getSelectedRow() != -1) {
+					doGo();
 				} else
 					JOptionPane.showMessageDialog(null, "ячейка заполнена");
 
@@ -238,7 +229,7 @@ public class Game extends JFrame {
 	}
 
 	// ход-ответ ИИ
-	public void ansGo() {
+	public static void ansGo() {
 		chechWin();
 		if (StartApp.CheckGame(table) == " ") {
 			int[] ans = StartApp.answer();
@@ -246,35 +237,46 @@ public class Game extends JFrame {
 			textPane.setText("PC ходит: " + (ans[0] + 1) + "," + (ans[1] + 1) + "\n" + textPane.getText());
 			chechWin();
 			iGo = 1;
-			//whoGo();
+			// whoGo();
+		}
+	}
+
+	public static void doGo() {
+		if (label_1.getText().equals("Ходит: " + StartApp.getName())&&table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) == ""&&!textPane.getText().contains("!")) {
+			table.getModel().setValueAt("X", table.getSelectedRow(), table.getSelectedColumn());
+			StartApp.doGo(table.getSelectedRow(), table.getSelectedColumn());
+			System.out.println("Ходим по координатам: " + table.getSelectedRow() + "," + table.getSelectedColumn()
+					+ "\n" + textPane.getText());
+			textPane.setText("Ходим по координатам: " + (table.getSelectedRow() + 1) + ","
+					+ (table.getSelectedColumn() + 1) + "\n" + textPane.getText());
+
+			if (StartApp.getTypeGame() == StartApp.PC) {
+				ansGo();
+			} else if (StartApp.getTypeGame() == StartApp.USER) {
+				StartApp.setMessageForSever("play," + table.getSelectedRow() + "," + table.getSelectedColumn());
+			}
+
+			iGo = 0;
+			// whoGo();
+			chechWin();
 		}
 	}
 
 	/*
-	// говорим пользователю чей сейчас ход
-	public void whoGo() {
-		// System.out.println(iGo);
-		if (StartApp.getTypeGame() == StartApp.PC) {
-			if (iGo == 1) {
-				label_1.setText("Ходит: " + StartApp.getName());
-			} else {
-				label_1.setText("Ходит: PC");
-			}
-
-		} else if (StartApp.getTypeGame() == StartApp.USER) {
-
-			if (iGo == 1) {
-				label_1.setText("Ходит: " + StartApp.getName());
-				button.setEnabled(true);
-			} else {
-				label_1.setText("Ходит: " + StartApp.getEnemyName());
-				button.setEnabled(false);
-			}
-			
-		}
-	}
-*/
-	public void chechWin() {
+	 * // говорим пользователю чей сейчас ход public void whoGo() { //
+	 * System.out.println(iGo); if (StartApp.getTypeGame() == StartApp.PC) { if (iGo
+	 * == 1) { label_1.setText("Ходит: " + StartApp.getName()); } else {
+	 * label_1.setText("Ходит: PC"); }
+	 * 
+	 * } else if (StartApp.getTypeGame() == StartApp.USER) {
+	 * 
+	 * if (iGo == 1) { label_1.setText("Ходит: " + StartApp.getName());
+	 * button.setEnabled(true); } else { label_1.setText("Ходит: " +
+	 * StartApp.getEnemyName()); button.setEnabled(false); }
+	 * 
+	 * } }
+	 */
+	public static void chechWin() {
 		String check = StartApp.CheckGame(table);
 		if (check.equals("X") || check.equals("O") || !StartApp.CanMove(table)) {
 			if (check.equals("X"))
@@ -293,9 +295,8 @@ public class Game extends JFrame {
 				e.printStackTrace();
 			}
 			button.setEnabled(false);
-			
-			
-			//StartApp.setMessageForSever("out");
+
+			// StartApp.setMessageForSever("out");
 		}
 	}
 }

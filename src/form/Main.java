@@ -48,6 +48,12 @@ public class Main extends JFrame {
 					Thread.sleep(1000);
 					if (StartApp.getStatus() != label_1.getText())
 						label_1.setText(StartApp.getStatus());
+					if(label_1.getText()=="Ошибка") {
+						textField.setEnabled(true);
+						textField_1.setEnabled(true);
+						button.setEnabled(true);
+						button_2.setEnabled(false);
+					}
 				}
 			} catch (Exception e) {
 				label_1.setText("Ошибка");

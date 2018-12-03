@@ -91,10 +91,11 @@ public class Client {
 
 			new WriteMsg().start();
 			new ReadMsg().start();
-			System.out.println("Подключено успешно ");
+			System.out.println("Подключено успешно");
 			StartApp.setStatus("Подключено");
 		} catch (Exception ex) {
 			System.out.println("Ошибочка вышла... ");
+			StartApp.setStatus("Ошибка");
 			fromserver.close();
 			in.close();
 			out.close();

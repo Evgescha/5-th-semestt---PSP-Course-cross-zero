@@ -105,6 +105,7 @@ public final class StartApp {
 	/**
 	 * Метод вывода главной формы на экран
 	 */
+	@SuppressWarnings("deprecation")
 	public static void showMainForm() {
 		mainForm.show();
 	}
@@ -112,6 +113,7 @@ public final class StartApp {
 	/**
 	 * Метод скрытия главной формы
 	 */
+	@SuppressWarnings("deprecation")
 	public static void hideMainForm() {
 		mainForm.hide();
 	}
@@ -119,6 +121,7 @@ public final class StartApp {
 	/**
 	 * Метод вывода формы с игрой на экран
 	 */
+	@SuppressWarnings("deprecation")
 	public static void showGameForm() {
 		gameForm.show();
 	}
@@ -126,6 +129,7 @@ public final class StartApp {
 	/**
 	 * Метод скрытия игровой формы
 	 */
+	@SuppressWarnings("deprecation")
 	public static void hideGameForm() {
 		gameForm.hide();
 	}
