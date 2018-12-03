@@ -32,6 +32,7 @@ public class Game extends JFrame {
 	private JPanel contentPane;
 	private JTable table;
 	boolean isExit = false;
+	boolean isWin = false;
 	static int typeGame = 0;
 	static int whyGO = 0;
 	static JTextPane textPane;
@@ -87,7 +88,7 @@ public class Game extends JFrame {
 		@Override
 		public void run() {
 			try {
-				while (!isExit) {
+				while (!isExit&&!isWin) {
 					Thread.sleep(500);
 					System.out.println("iG0 " + iGo);
 					if (StartApp.getTypeGame() == StartApp.PC) {
@@ -112,8 +113,8 @@ public class Game extends JFrame {
 					}
 
 				}
-				Thread.sleep(1000);
-				button.setEnabled(false);
+			
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -284,11 +285,17 @@ public class Game extends JFrame {
 			if (!StartApp.CanMove(table))
 				textPane.setText("Интересно вышло, ходы кончились... Еще раз!" + "\n" + textPane.getText());
 			// RA.stop();
-
+			isWin = true;
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			button.setEnabled(false);
 			
-			isExit = false;
-			StartApp.setMessageForSever("out");
+			
+			//StartApp.setMessageForSever("out");
 		}
 	}
 }
