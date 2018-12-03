@@ -46,8 +46,8 @@ public class Main extends JFrame {
 			try {
 				while (true) {
 					Thread.sleep(1000);
-					if(StartApp.getStatus()!=label_1.getText())
-					label_1.setText(StartApp.getStatus());
+					if (StartApp.getStatus() != label_1.getText())
+						label_1.setText(StartApp.getStatus());
 				}
 			} catch (Exception e) {
 				label_1.setText("Ошибка");
@@ -66,7 +66,7 @@ public class Main extends JFrame {
 	 */
 	private void initialize() {
 		// установка панели, размеров, действия при закрытии
-		this.setBounds(100, 100, 311, 249);
+		setBounds(100, 100, 311, 249);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.getContentPane().setLayout(null);
 
@@ -76,12 +76,13 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				// работать лишь при условии что имя введено
 				if (!textField.getText().isEmpty()) {
+					
 					// Сохранении имени и запуск подключения
 					StartApp.setName(textField.getText());
 					textField.setEnabled(false);
+					textField_1.setEnabled(false);
 					button.setEnabled(false);
 					button_2.setEnabled(true);
-					button_1.setEnabled(true);
 					try {
 						StartApp.client.main(null);
 					} catch (IOException e) {
@@ -109,6 +110,7 @@ public class Main extends JFrame {
 		this.getContentPane().add(label_2);
 
 		textField = new JTextField();
+		textField.setText("Anonimus");
 		textField.setBounds(127, 88, 176, 20);
 		this.getContentPane().add(textField);
 		textField.setColumns(10);
@@ -118,46 +120,48 @@ public class Main extends JFrame {
 		this.getContentPane().add(label_3);
 
 		button_1 = new JButton("Игра с компьютером");
-		button_1.setEnabled(false);
 		button_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				//if (label_1.getText() == "Подключено") {
+				if (!textField.getText().isEmpty()) {
+					StartApp.setName(textField.getText());
 					StartApp.setTypeGame(StartApp.PC);
+					StartApp.setArr(new int[3][3]);
 					StartApp.newGameForm();
 					StartApp.showGameForm();
 					StartApp.hideMainForm();
-					StartApp.setIsGame("one");
-				//}
-			}
+				} else
+					JOptionPane.showMessageDialog(null, "Введите ваше имя для игры");
+				}
 		});
 		button_1.setBounds(10, 153, 293, 23);
 		this.getContentPane().add(button_1);
-
 		button_2 = new JButton("Игра с человеком");
 		button_2.setEnabled(false);
 		button_2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				StartApp.setName(textField.getText());
 				StartApp.setTypeGame(StartApp.USER);
 				StartApp.newGameForm();
-				StartApp.setIdEnemy(-2);
-				StartApp.setIsGame("find");
+				//StartApp.setIdEnemy(-1);				
 				StartApp.showGameForm();
 				StartApp.hideMainForm();
 			}
 		});
 		button_2.setBounds(10, 187, 293, 23);
 		this.getContentPane().add(button_2);
-		
+
 		textField_1 = new JTextField();
+		textField_1.setText("127.0.0.1");
 		textField_1.setBounds(127, 4, 176, 20);
 		getContentPane().add(textField_1);
 		textField_1.setColumns(10);
-		
+
 		JLabel lblIp = new JLabel("Введите IP:");
 		lblIp.setBounds(10, 3, 107, 23);
 		getContentPane().add(lblIp);
 
 		// button.setVisible(false);
+		
 
 	}
 }

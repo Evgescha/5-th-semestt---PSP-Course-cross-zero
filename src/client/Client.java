@@ -37,8 +37,14 @@ public class Client {
 					msgIn = in.readLine(); // ждем сообщения с сервера
 					System.out.println("С сервера пришло "+msgIn); // пишем сообщение с сервера на консоль
 					String[] ans = msgIn.split(",");
-					StartApp.setAnsX(ans[1]);
-					StartApp.setAnsY(ans[2]);
+					if(ans[0].contains("findYes")) {
+						StartApp.firstGo = ans[1];
+						StartApp.setEnemyName(ans[2]);
+					}else if(ans[0].contains("play")){
+						StartApp.setAnsX(ans[1]);
+						StartApp.setAnsY(ans[2]);	
+					}
+					
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -75,10 +81,7 @@ public class Client {
 		System.out.println("Ваш IP адрес (не сервера) - " + IP.getHostAddress());
 
 		Socket fromserver = null;
-		// System.out.println("Выберите порт для подключения(по умолчанию 8080)");
-		// int portServ = sc.nextInt();
-		// System.out.println("Введите IP подключения (127.0.0.1 по умолчанию)");
-		// addres = inu.readLine();
+	
 
 		System.out.println("Подключение... ");
 		try {

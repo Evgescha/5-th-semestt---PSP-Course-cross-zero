@@ -41,6 +41,7 @@ class Server {
 				Socket socket = server.accept();
 				try {
 					serverList.add(new Serverss(socket, id)); // добавить новое соединенние в список
+					System.out.println("одключился пользователь с ид " + id);
 					id++;
 				} catch (IOException e) {
 					// Если завершится неудачей, закрывается сокет,
@@ -61,11 +62,14 @@ class Serverss extends Thread {
 	PrintWriter out = null;
 	ArrayList<String> list = new ArrayList<String>();
 	Socket fromclient = null;
-	int[][] arr = new int[3][3];
-	static int ID = -1;
-	static int idEnemy = -1;
+	String myName = "";
+	int ID = -1;
+	int idEnemy = -1;
+	boolean isSearh = false;
+	Serverss thiss = null;
 
 	public Serverss(Socket fromclient, int id) throws IOException {
+		thiss = this;
 		this.fromclient = fromclient;
 		ID = id;
 		in = new BufferedReader(new InputStreamReader(fromclient.getInputStream()));
@@ -74,20 +78,8 @@ class Serverss extends Thread {
 		start();
 	}
 
-	// void sendMessage(String msg) {
-	// for (Serverss vr : Server.serverList) {
-	// vr.out.println(msg);
-	// }
-	// }
-	//
-
-	public void printArr() {
-		for (int i = 0; i < 3; i++) {
-			for (int j = 0; j < 3; j++) {
-				System.out.print(arr[i][j]);
-			}
-			System.out.println();
-		}
+	public void writeMsg(String sms) {
+		out.println(sms);
 	}
 
 	@Override
@@ -98,30 +90,50 @@ class Serverss extends Thread {
 				input = in.readLine();
 				System.out.println("В чате пишут: " + input);
 				String[] ans = input.split(",");
-				if (!ans[1].equals("newArr")) {
-					
-					int x_, x = Integer.parseInt(ans[1]);
-					int y_, y = Integer.parseInt(ans[2]);
-					arr[x][y] = 1;
-					printArr();
-
-					if (Integer.parseInt(ans[3]) == -1) {
-
-						do {
-							x_ = (int) (Math.random() * 3);
-							y_ = (int) (Math.random() * 3);
-						} while (arr[x_][y_] != 0);
-						arr[x_][y_] = 5;
-						out.println("-1," + x_ + "," + y_);
-					} else {
+				// принимаем: поиск, имя, кто ходит
+				if (ans[0].contains("find")) {
+					boolean findYes = false;
+					myName = ans[1];
+					for (Serverss serv : Server.serverList) {
+						if (serv.isSearh) {
+							
+							this.idEnemy = Server.serverList.indexOf(serv);
+							serv.idEnemy = Server.serverList.indexOf(this);
+							serv.isSearh = false;						
+							boolean firstHod = false;
+							int iGo = Math.random() > 0.5 ? 1 : 0;
+							if (iGo == 1)
+								firstHod = true;
+							else
+								firstHod = false;
+							out.println("findYes," + firstHod + "," + serv.myName);
+							serv.writeMsg("findYes," + !firstHod + "," + myName);
+							findYes = true;
+							System.out.println("Нашли врагов и направили их друг на друга");
+							break;
+						}
 					}
-				} else {
-					arr = new int[3][3];
+					if (!findYes) {
+						isSearh = true;
+						out.println("Ожидаем");
+					}
+				} else if (ans[0].contains("out")) {
+//					if(idEnemy!=-1) {
+					//if(Server.serverList.remove(this))System.out.print("Удален из списка ид " + ID);
+					idEnemy = -1;					
+					//Server.serverList.add(this);
+//					}
+				} else if (ans[0].contains("play")) {
+					System.out.println("Пришла ответка от " + ID);
+					if(idEnemy != -1)
+					Server.serverList.get(idEnemy).writeMsg(input);
+
 				}
+
 			}
 		} catch (IOException e) {
 			// System.out.println("Общение скончалось(((");
-			System.out.println("Пользователь с ID " + ID + " вышел");
+			System.out.println("Пользователь с ID " + this.ID + " вышел");
 			Server.serverList.remove(this);
 			// e.printStackTrace();
 		}
