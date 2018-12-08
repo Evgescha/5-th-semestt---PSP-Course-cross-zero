@@ -147,8 +147,7 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				StartApp.setName(textField.getText());
 				StartApp.setTypeGame(StartApp.USER);
-				StartApp.newGameForm();
-				//StartApp.setIdEnemy(-1);				
+				StartApp.newGameForm();			
 				StartApp.showGameForm();
 				StartApp.hideMainForm();
 			}
