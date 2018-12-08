@@ -65,7 +65,7 @@ public class Game extends JFrame {
 
 						table.getModel().setValueAt("O", Integer.parseInt(StartApp.getAnsX()),
 								Integer.parseInt(StartApp.getAnsY()));
-						textPane.setText("Противник ходит: " + (Integer.parseInt(StartApp.getAnsX()) + 1) + ","
+						textPane.setText(StartApp.getEnemyName()+" ходит: " + (Integer.parseInt(StartApp.getAnsX()) + 1) + ","
 								+ (Integer.parseInt(StartApp.getAnsY()) + 1) + "\n" + textPane.getText());
 
 						StartApp.setAnsX("-1");
@@ -88,7 +88,7 @@ public class Game extends JFrame {
 			try {
 				while (!isExit && !isWin) {
 					Thread.sleep(500);
-					System.out.println("iG0 " + iGo);
+					System.out.println("Твой ход? " + iGo);
 					if (StartApp.getTypeGame() == StartApp.PC) {
 						if (iGo == 1) {
 							label_1.setText("Ходит: " + StartApp.getName());
@@ -224,7 +224,6 @@ public class Game extends JFrame {
 		}
 		hod.start();
 		RA.start();
-		// RW = new ReadWin();RW.start();
 
 	}
 
@@ -242,40 +241,33 @@ public class Game extends JFrame {
 	}
 
 	public static void doGo() {
+		// проверяем ход клиента или нет, выбрана ли ячейка
 		if (label_1.getText().equals("Ходит: " + StartApp.getName())&&table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn()) == ""&&!textPane.getText().contains("!")) {
+			// если да, ставим значение в пустую ячейку
 			table.getModel().setValueAt("X", table.getSelectedRow(), table.getSelectedColumn());
+			//добавляем запись в массив
 			StartApp.doGo(table.getSelectedRow(), table.getSelectedColumn());
+			// выводим в консоль для отладки
 			System.out.println("Ходим по координатам: " + table.getSelectedRow() + "," + table.getSelectedColumn()
 					+ "\n" + textPane.getText());
+			//выводим ход в историю ходов
 			textPane.setText("Ходим по координатам: " + (table.getSelectedRow() + 1) + ","
 					+ (table.getSelectedColumn() + 1) + "\n" + textPane.getText());
-
+			// говорим что походили
+			iGo = 0;
+			//если играем с пк, говорим ему ходить
 			if (StartApp.getTypeGame() == StartApp.PC) {
 				ansGo();
+				//если играем с пользователем, отправляем ему свой ход
 			} else if (StartApp.getTypeGame() == StartApp.USER) {
 				StartApp.setMessageForSever("play," + table.getSelectedRow() + "," + table.getSelectedColumn());
-			}
-
-			iGo = 0;
-			// whoGo();
+			}			
+			// проверяем выиграл ли кто
 			chechWin();
 		}
 	}
 
-	/*
-	 * // говорим пользователю чей сейчас ход public void whoGo() { //
-	 * System.out.println(iGo); if (StartApp.getTypeGame() == StartApp.PC) { if (iGo
-	 * == 1) { label_1.setText("Ходит: " + StartApp.getName()); } else {
-	 * label_1.setText("Ходит: PC"); }
-	 * 
-	 * } else if (StartApp.getTypeGame() == StartApp.USER) {
-	 * 
-	 * if (iGo == 1) { label_1.setText("Ходит: " + StartApp.getName());
-	 * button.setEnabled(true); } else { label_1.setText("Ходит: " +
-	 * StartApp.getEnemyName()); button.setEnabled(false); }
-	 * 
-	 * } }
-	 */
+	
 	public static void chechWin() {
 		String check = StartApp.CheckGame(table);
 		if (check.equals("X") || check.equals("O") || !StartApp.CanMove(table)) {

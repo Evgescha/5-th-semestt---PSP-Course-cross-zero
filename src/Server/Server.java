@@ -87,14 +87,19 @@ class Serverss extends Thread {
 		// new WriteMsg().start();
 		try {
 			while (true) {
+				// читаем чат
 				input = in.readLine();
 				System.out.println("В чате пишут: " + input);
+				// делим на команды
 				String[] ans = input.split(",");
 				// принимаем: поиск, имя, кто ходит
 				if (ans[0].contains("find")) {
+					// если ищем мы
 					boolean findYes = false;
 					myName = ans[1];
+					// прогоняем весь список игроков
 					for (Serverss serv : Server.serverList) {
+						// если ищет кто-то еще, устанавливаем ему врагами нас, делаем его своим врагом. Отправляем запрос на старт игры
 						if (serv.isSearh) {
 							
 							this.idEnemy = Server.serverList.indexOf(serv);
@@ -113,21 +118,19 @@ class Serverss extends Thread {
 							break;
 						}
 					}
+					// если нокто больше не ищет, говорим всем что ищем мы и ожидаем соперника
 					if (!findYes) {
 						isSearh = true;
 						out.println("Ожидаем");
 					}
+					// если нажата кнопка назад, прощается с соперником
 				} else if (ans[0].contains("out")) {
-//					if(idEnemy!=-1) {
-					//if(Server.serverList.remove(this))System.out.print("Удален из списка ид " + ID);
-					idEnemy = -1;					
-					//Server.serverList.add(this);
-//					}
+					idEnemy = -1;				
+					// для отладки выводим ход соперника в консоль
 				} else if (ans[0].contains("play")) {
 					System.out.println("Пришла ответка от " + ID);
 					if(idEnemy != -1)
 					Server.serverList.get(idEnemy).writeMsg(input);
-
 				}
 
 			}
